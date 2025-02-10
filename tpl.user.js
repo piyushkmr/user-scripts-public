@@ -129,6 +129,9 @@ const addProgressbarStyle = () => {
   `, 'progressbarStyle');
 }
 const init = () => {
+  if (!window.location.pathname.startsWith('/holds')) {
+    return;
+  }
   waitFor(isLoaded, null, 10000).then(() => {
     addProgressbarStyle();
     getItemPositions().forEach((itemPosition) => {
@@ -136,8 +139,7 @@ const init = () => {
     });
   });
 }
-
 window.addEventListener('pushState', function(e) {
-    init();
+  init();
 });
 init();
