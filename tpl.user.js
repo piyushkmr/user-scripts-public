@@ -14,7 +14,17 @@ const $$ = {
   COPIES: '.copies',
 }
 
-
+const _wr = function(type) {
+    var orig = history[type];
+    return function() {
+        var rv = orig.apply(this, arguments);
+        var e = new Event(type);
+        e.arguments = arguments;
+        window.dispatchEvent(e);
+        return rv;
+    };
+};
+history.pushState = _wr('pushState'), history.replaceState = _wr('replaceState');
 
 const waitFor = (functionRunner, condition, timeout = 200) => {
   const timeoutIncrements = 100;
@@ -127,6 +137,7 @@ const init = () => {
   });
 }
 
-window.init = init;
-
+window.addEventListener('pushState', function(e) {
+    init();
+});
 init();
