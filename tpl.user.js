@@ -50,6 +50,12 @@ const addStyle = (styleString, id) => {
   document.head.append(style);
 }
 
+const formatDate = (date, options = {}) => {
+  const formatOptions = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', ...options };
+  const formattedDate = date.toLocaleDateString("en-US", formatOptions);
+  return formattedDate;
+}
+
 
 const parseItemPosition = (itemPositionString, copiesString) => {
   if (!itemPositionString.includes('#') || !itemPositionString.includes('of')) {
@@ -98,6 +104,22 @@ const createProgressBar = (itemPosition) => {
   return progressBar;
 }
 
+const calculateWaitTime = (itemPosition) => {
+  const waitTimeContainer = document.createElement('div');
+  const { current, total, copies, parent } = itemPosition;
+  const holdsPerCopies = (current/copies);
+  const waitPerCopy = 3; //weeks
+  const waitTime = Math.ceil(holdsPerCopies * waitPerCopy);
+
+  const availableDate = new Date();
+  availableDate.setDate(availableDate.getDate() + waitTime * 7);
+  const formattedDate = formatDate(availableDate);
+
+  waitTimeContainer.innerHTML = `${waitTime} weeks <br/> ${formattedDate}`;
+  parent.append(waitTimeContainer);
+  return waitTimeContainer;
+}
+
 const isLoaded = () => {
   return document.querySelector($$.ITEM_POS_CONTAINER);
 }
@@ -136,6 +158,7 @@ const init = () => {
     addProgressbarStyle();
     getItemPositions().forEach((itemPosition) => {
       createProgressBar(itemPosition);
+      calculateWaitTime(itemPosition);
     });
   });
 }
